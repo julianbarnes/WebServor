@@ -46,8 +46,8 @@ HTTP/1.1 200 OK
         connection_socket.sendall(response.encode())              
         #Send the content of the requested file to the client
         for i in range(0, len(outputdata)):           
-            connection_socket.sendall(outputdata[i].encode())
-            connection_socket.sendall("\r\n".encode())
+            connection_socket.sendall(outputdata[i].encode('utf-8'))
+            connection_socket.sendall("\r\n".encode('utf-8'))
         
         #connection_socket.close()
     except IOError:

@@ -16,6 +16,7 @@ def process_type(extension):
         pass
 
 server_socket = socket(AF_INET, SOCK_STREAM)
+server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 #Prepare a sever socket
 #Fill in start
 server_socket.bind(('',12000))

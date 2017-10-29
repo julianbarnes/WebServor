@@ -1,3 +1,6 @@
 #!/bin/bash
 
-python BookWebServer.py 12 12000
+PORT=$1
+ROOTDIR=$2
+
+python BookWebServer.py $1 $2

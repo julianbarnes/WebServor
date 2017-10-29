@@ -5,12 +5,17 @@ import io
 import argparse
 
 	
+#Add arguments
+parser = argparse.ArgumentParser(description='Configure IP Address and Port number for server.')
+parser.add_argument('ipaddress', type=int, help='IP address of the server you want to call')
+parser.add_argument('port', type=int, help='Port number')
+args = parser.parse_args()
 
 
 server_socket = socket(AF_INET, SOCK_STREAM)
 server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 #Prepare a sever socket
-server_socket.bind(('',12000))
+server_socket.bind(('',args.port))
 server_socket.listen(10)
 while True:
     #Establish the connection

@@ -5,6 +5,7 @@ import io
 import argparse
 import os
 
+#def get_params
 	
 #Add arguments
 parser = argparse.ArgumentParser(description='Configure IP Address and Port number for server.')
@@ -51,20 +52,16 @@ while True:
             #f = io.open(filename[1:], encoding="latin1")
             
         print("." + args.root + "/" + filename[1:])                        
-        outputdata = f.readlines()               
+        outputdata = f.read()               
         #Send one HTTP header line into socket
         #print(outputdata[0])
-        response = """
-		HTTP/1.1 200 OK
-		Content-Type: {}
-		Content-Length: {}
-        """.format(filetype, size)
+        response = """HTTP/1.1 200 OK\nContent-Type: {}\nContent-Length: {}\n\n""".format(filetype, size)
         print(response)
-        connection_socket.sendall(response)              
+        connection_socket.send(response)              
         #Send the content of the requested file to the client
-        for i in range(0, len(outputdata)):           
-            connection_socket.sendall(outputdata[i])
-            connection_socket.sendall("\r\n")
+        #for i in range(0, len(outputdata)):           
+        connection_socket.send(outputdata)
+        #connection_socket.sendall("\r\n")
         
         #connection_socket.close()
     except IOError as e:

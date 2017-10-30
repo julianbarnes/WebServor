@@ -31,14 +31,17 @@ while True:
         filename = message.decode().split()[1]
         content_ext = filename.split(".")[-1]
         extensions = {"html":"text/html", "css":"text/css","js":"text/javascript","jpg":"image/jpeg","png":"image/png"} 
-        #print(filename)
+        print("Filename: " + filename)
         filetype = extensions.get(content_ext)
-        
-        if(os.path.exists("."+args.root+"/"+filename)):
-            size = os.path.getsize("."+args.root+"/"+filename)
+		
+        if(filename == "/"):
+			print("default")
+			filename = "/index.html"
+		
+        if(os.path.exists(args.root+filename)):
+            size = os.path.getsize(args.root+"/"+filename)
         else:
             size = 0
-        
         
         
         #Redirect to root directory
@@ -66,11 +69,19 @@ while True:
         #connection_socket.close()
     except IOError as e:
 		#Send response message for file not found
-		error_response = "<h1>404 NOT FOUND</h1>"
+		error_response = """
+		<div align="center">
+		<h1>404 NOT FOUND</h1>
+		<hr>
+		<h3>Computer Network Project 2</h3>
+		<h3>2017843537</h3>
+		</div>
+		"""
 		notfound = "HTTP/1.1 404 Not Found\n"
 		notfound += "Content-Type: text/html\n"
 		notfound += "Content-Length: " + str(sys.getsizeof(error_response))
 		notfound += "\n\n" + error_response
+		notfound += ""
 		connection_socket.sendall(notfound)
 		
 		print(e)

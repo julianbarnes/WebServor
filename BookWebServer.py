@@ -43,7 +43,7 @@ while True:
         
         #Redirect to root directory
         #if("html" in filename[1:]):
-        f = io.open("." + args.root + "/" + filename[1:], encoding="latin1")
+        f = open("" + args.root + "/" + filename[1:], "rb")
         #else:
             #f = io.open(filename[1:], encoding="latin1")
             
@@ -51,37 +51,31 @@ while True:
         outputdata = f.readlines()               
         #Send one HTTP header line into socket
         #print(outputdata[0])
-        response = """\
-HTTP/1.1 200 OK
-Content-Type: {}
-Content-Length: {}
-            """.format(filetype, size)
+        response = """
+		HTTP/1.1 200 OK
+		Content-Type: {}
+		Content-Length: {}
+        """.format(filetype, size)
         print(response)
-        connection_socket.sendall(response.encode())              
+        connection_socket.sendall(response)              
         #Send the content of the requested file to the client
         for i in range(0, len(outputdata)):           
-            connection_socket.sendall(outputdata[i].encode('utf-8'))
-            connection_socket.sendall("\r\n".encode('utf-8'))
+            connection_socket.sendall(outputdata[i])
+            connection_socket.sendall("\r\n")
         
         #connection_socket.close()
     except IOError as e:
-        #Send response message for file not found
-        
-        print(e)
-        notfound = """\
-        HTTP/1.1 404 Not Found\r\n\r\n
-        
-        Content-Type: text/html
-        Content-Length: 400
-        
-        <h1>404 NOT FOUND</h1>
-        
-        """
-        connection_socket.sendall(notfound.encode()) 
-
-
-        #Close client socket
-        #connection_socket.close()
+		#Send response message for file not found
+		error_response = "<h1>404 NOT FOUND</h1>"
+		notfound = "HTTP/1.1 404 Not Found\n"
+		notfound += "Content-Type: text/html\n"
+		notfound += "Content-Length: " + str(sys.getsizeof(error_response))
+		notfound += "\n\n" + error_response
+		connection_socket.sendall(notfound)
+		
+		print(e)
+		#Close client socket
+		#connection_socket.close()
 connection_socket.close()       
 server_socket.close()
 print("Closed")

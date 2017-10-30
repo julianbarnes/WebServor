@@ -51,7 +51,7 @@ while True:
         #else:
             #f = io.open(filename[1:], encoding="latin1")
             
-        print("." + args.root + "/" + filename[1:])                        
+        print(args.root + "/" + filename[1:])                        
         outputdata = f.read()               
         #Send one HTTP header line into socket
         #print(outputdata[0])
@@ -68,12 +68,13 @@ while True:
 		#Send response message for file not found
 		error_response = """
 		<div align="center">
+		<h2>{}</h2>
 		<h1>404 NOT FOUND</h1>
 		<hr>
 		<h3>Computer Network Project 2</h3>
 		<h3>2017843537</h3>
 		</div>
-		"""
+		""".format(args.root + "/" + filename[1:])
 		notfound = "HTTP/1.1 404 Not Found\n"
 		notfound += "Content-Type: text/html\n"
 		notfound += "Content-Length: " + str(sys.getsizeof(error_response))

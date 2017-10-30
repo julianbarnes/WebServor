@@ -48,7 +48,7 @@ while True:
             #f = io.open(filename[1:], encoding="latin1")
             
         print("." + args.root + "/" + filename[1:])                        
-        outputdata = f.readlines()                 
+        outputdata = f.readlines()               
         #Send one HTTP header line into socket
         #print(outputdata[0])
         response = """\
@@ -63,7 +63,7 @@ Content-Length: {}
             connection_socket.sendall(outputdata[i].encode('utf-8'))
             connection_socket.sendall("\r\n".encode('utf-8'))
         
-        connection_socket.close()
+        #connection_socket.close()
     except IOError as e:
         #Send response message for file not found
         
@@ -81,8 +81,8 @@ Content-Length: {}
 
 
         #Close client socket
-        connection_socket.close()
-        
+        #connection_socket.close()
+connection_socket.close()       
 server_socket.close()
 print("Closed")
 sys.exit()#Terminate the program after sending the corresponding data                                    

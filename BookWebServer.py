@@ -30,6 +30,46 @@ def create_error(file):
 		notfound += ""
 		return notfound
 
+def connect_client(connection, args):
+	try:
+		message = connection.recv(1024)
+		#print("Connected")
+		print(message)
+		filename = message.decode().split()[1]
+		content_ext = filename.split(".")[-1]
+		extensions = {"html":"text/html", "css":"text/css","js":"text/javascript","jpg":"image/jpeg","png":"image/png"} 
+		#print("Filename: " + filename)
+		filetype = extensions.get(content_ext)
+
+		if(filename == "/"):
+			print("default")
+			filename = "/index.html"
+
+		if(os.path.exists(args.root+filename)):
+			size = os.path.getsize(args.root+"/"+filename)
+		else:
+			size = 0
+
+
+		#Redirect to root directory
+
+		f = open("" + args.root + "/" + filename[1:], "rb")
+
+
+		#print(args.root + "/" + filename[1:])                        
+		outputdata = f.read()               
+		#Send one HTTP header line into socket
+		response = """HTTP/1.1 200 OK\nContent-Type: {}\nContent-Length: {}\n\n""".format(filetype, size)
+		print(response)
+		connection.send(response)              
+		#Send the content of the requested file to the client
+
+		connection.send(outputdata)
+        
+	except IOError as e:
+		connection.send(create_error(filename))
+		print(e)
+	
 args = get_params()
 server_socket = socket(AF_INET, SOCK_STREAM)
 server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -38,48 +78,11 @@ server_socket.bind(('',args.port))
 server_socket.listen(10)
 
 while True:
-    #Establish the connection
-    print('Ready to serve...')
-    connection_socket, addr = server_socket.accept()
-    #print("Accepted")        
-    try:
-        message = connection_socket.recv(1024)
-        #print("Connected")
-        print(message)
-        filename = message.decode().split()[1]
-        content_ext = filename.split(".")[-1]
-        extensions = {"html":"text/html", "css":"text/css","js":"text/javascript","jpg":"image/jpeg","png":"image/png"} 
-        #print("Filename: " + filename)
-        filetype = extensions.get(content_ext)
-		
-        if(filename == "/"):
-			print("default")
-			filename = "/index.html"
-		
-        if(os.path.exists(args.root+filename)):
-        	size = os.path.getsize(args.root+"/"+filename)
-        else:
-            size = 0
-        
-        
-        #Redirect to root directory
-        
-        f = open("" + args.root + "/" + filename[1:], "rb")
-        
-            
-        #print(args.root + "/" + filename[1:])                        
-        outputdata = f.read()               
-        #Send one HTTP header line into socket
-        response = """HTTP/1.1 200 OK\nContent-Type: {}\nContent-Length: {}\n\n""".format(filetype, size)
-        print(response)
-        connection_socket.send(response)              
-        #Send the content of the requested file to the client
-                   
-        connection_socket.send(outputdata)
-        
-    except IOError as e:
-		connection_socket.send(create_error(filename))
-		print(e)
+	#Establish the connection
+	print('Ready to serve...')
+	connection_socket, addr = server_socket.accept()
+	#print("Accepted")        
+	connect_client(connection_socket, args)
 		
 connection_socket.close()       
 server_socket.close()

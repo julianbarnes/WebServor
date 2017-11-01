@@ -34,6 +34,17 @@ def is_mobile(message):
 	print(message)
 	return message.upper().find("MOBILE") != -1
 
+def is_aa3(message):
+	return message.find("aa3.html") != -1
+
+def get_host(message):
+	lines = message.split()
+	for line in lines:
+		if("Host:" in line):
+			host = line[6:]
+	return host
+	
+
 def connect_client(connection, args):
 	try:
 		message = connection.recv(1024)
@@ -42,31 +53,28 @@ def connect_client(connection, args):
 		filename = message.decode().split()[1]
 		content_ext = filename.split(".")[-1]
 		extensions = {"html":"text/html", "css":"text/css","js":"text/javascript","jpg":"image/jpeg","png":"image/png"} 
-		#print("Filename: " + filename)
 		filetype = extensions.get(content_ext)
-
+		
+		if(is_aa3(message)):
+			message.format(get_host(message))
+		#Redirect to root directory
 		if(filename == "/"):
 			print("default")
 			filename = "/index.html"
-			
+		
 		if(is_mobile(message)):
 			print("\nMOBILE\n")
 			path = args.root + "/mobile" + filename
 		else:
 			path = args.root + filename
-
+		
+		#Calculate file size
 		if(os.path.exists(path)):
 			size = os.path.getsize(path)
 		else:
 			size = 0
 
-
-		#Redirect to root directory
-
-		f = open(path, "rb")
-
-
-		#print(args.root + "/" + filename[1:])                        
+		f = open(path, "rb")                        
 		outputdata = f.read()               
 		#Send one HTTP header line into socket
 		response = """HTTP/1.1 200 OK\nContent-Type: {}\nContent-Length: {}\n\n""".format(filetype, size)

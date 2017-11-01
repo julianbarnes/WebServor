@@ -12,7 +12,7 @@ def get_params():
 	args = parser.parse_args()
 	return args
 
-def create_error(file):
+def create_error(file, path):
 	#Send response message for file not found
 		error_response = """
 		<div align="center">
@@ -22,13 +22,17 @@ def create_error(file):
 		<h3>Computer Network Project 2</h3>
 		<h3>2017843537</h3>
 		</div>
-		""".format(args.root + file)
+		""".format(path)
 		notfound = "HTTP/1.1 404 Not Found\n"
 		notfound += "Content-Type: text/html\n"
 		notfound += "Content-Length: " + str(sys.getsizeof(error_response))
 		notfound += "\n\n" + error_response
 		notfound += ""
 		return notfound
+
+def is_mobile(message):
+	print(message)
+	return message.upper().find("MOBILE") != -1
 
 def connect_client(connection, args):
 	try:
@@ -44,16 +48,22 @@ def connect_client(connection, args):
 		if(filename == "/"):
 			print("default")
 			filename = "/index.html"
+			
+		if(is_mobile(message)):
+			print("\nMOBILE\n")
+			path = args.root + "/mobile" + filename
+		else:
+			path = args.root + filename
 
-		if(os.path.exists(args.root+filename)):
-			size = os.path.getsize(args.root+"/"+filename)
+		if(os.path.exists(path)):
+			size = os.path.getsize(path)
 		else:
 			size = 0
 
 
 		#Redirect to root directory
 
-		f = open("" + args.root + "/" + filename[1:], "rb")
+		f = open(path, "rb")
 
 
 		#print(args.root + "/" + filename[1:])                        
@@ -67,7 +77,7 @@ def connect_client(connection, args):
 		connection.send(outputdata)
         
 	except IOError as e:
-		connection.send(create_error(filename))
+		connection.send(create_error(filename, path))
 		print(e)
 	
 args = get_params()
@@ -83,8 +93,8 @@ while True:
 	connection_socket, addr = server_socket.accept()
 	#print("Accepted")        
 	connect_client(connection_socket, args)
-		
-connection_socket.close()       
+	connection_socket.close()
+	
 server_socket.close()
 print("Closed")
 sys.exit()#Terminate the program after sending the corresponding data                                    
